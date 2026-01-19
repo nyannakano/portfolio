@@ -1069,7 +1069,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
                         </span>
                       </div>
                     </div>
-                    <div class="flex flex-col gap-2 shrink-0">
+                    <div class="flex flex-col gap-2 shrink-0 notranslate" translate="no">
                       <button
                         v-if="project.images && project.images.length > 0"
                         class="command-btn text-xs !px-3 !py-1"
@@ -1125,7 +1125,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
                         </span>
                       </div>
                     </div>
-                    <div class="flex flex-col gap-2 shrink-0">
+                    <div class="flex flex-col gap-2 shrink-0 notranslate" translate="no">
                       <button
                         class="command-btn text-xs !px-3 !py-1"
                         @click="openExperienceModal(experience)"
@@ -1138,7 +1138,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
               </div>
 
               <!-- Contact Links (shown after typing completes) -->
-              <div v-if="currentSection === 'contact' && !isTyping" class="mt-4 space-y-2">
+              <div v-if="currentSection === 'contact' && !isTyping" class="mt-4 space-y-2 notranslate" translate="no">
                 <a
                   v-for="contact in t.contacts"
                   :key="contact.label"
@@ -1154,7 +1154,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
               </div>
 
               <!-- Language Selection Buttons -->
-              <div v-if="showLanguageSelection && !isTyping" class="mt-4 flex justify-center gap-4">
+              <div v-if="showLanguageSelection && !isTyping" class="mt-4 flex justify-center gap-4 notranslate" translate="no">
                 <button
                   class="command-btn !px-6 !py-3 text-base"
                   @click="selectLanguage('en')"
@@ -1177,8 +1177,8 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
             </div>
 
             <!-- Command Buttons -->
-            <div v-if="!showLanguageSelection" class="p-4 border-t border-terminal bg-terminal-header/30">
-              <div class="flex flex-wrap gap-2">
+            <div v-if="!showLanguageSelection" class="p-4 border-t border-terminal bg-terminal-header/30" translate="no">
+              <div class="flex flex-wrap gap-2 notranslate">
                 <button
                   class="command-btn"
                   :disabled="isTyping"
@@ -1352,7 +1352,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
             <span class="text-terminal-muted text-xs">
               {{ t.ui.pressEscArrows }}
             </span>
-            <button class="command-btn text-xs" @click="closeModal">
+            <button class="command-btn text-xs notranslate" translate="no" @click="closeModal">
               [ {{ t.ui.close }} ]
             </button>
           </div>
@@ -1442,7 +1442,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
             <span class="text-terminal-muted text-xs">
               {{ t.ui.pressEscToClose }}
             </span>
-            <button class="command-btn text-xs" @click="closeExperienceModal">
+            <button class="command-btn text-xs notranslate" translate="no" @click="closeExperienceModal">
               [ {{ t.ui.close }} ]
             </button>
           </div>
