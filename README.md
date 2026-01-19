@@ -23,14 +23,15 @@ The entire UI is a terminal window centered on the screen, featuring:
 
 ## Features
 
-| Command | Description |
-|---------|-------------|
-| `whoami` | Professional bio and description |
+| Command       | Description                            |
+|---------------|----------------------------------------|
+| `whoami`      | Professional bio and description       |
 | `ls projects` | Grid of project cards with tech stacks |
-| `neofetch` | System information display |
-| `contact` | Social links and contact info |
-| `clear` | Clear terminal output |
-| `home` | Return to welcome screen |
+| `neofetch`    | System information display             |
+| `contact`     | Social links and contact info          |
+| `history`     | Professional experience                |
+| `clear`       | Clear terminal output                  |
+| `home`        | Return to welcome screen               |
 
 ### Visual Features
 
