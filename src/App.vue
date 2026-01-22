@@ -9,7 +9,7 @@ const showLanguageSelection = ref(!localStorage.getItem('portfolio-locale'))
 const translations = {
   en: {
     professionalBio: `
-  Fullstack Developer with 6+ years of experience building scalable systems and
+  Fullstack Developer with 5+ years of experience building scalable systems and
   RESTful APIs.
   Expert in the Laravel ecosystem and modern Javascript frameworks.
   My expertise lies in bridging complex backend architecture with reactive,
@@ -42,7 +42,7 @@ const translations = {
       os: 'Laravel 12',
       shell: 'Vue 3 + TypeScript',
       terminal: 'Tailwind CSS',
-      uptime: '6+ years of experience',
+      uptime: '5+ years of experience',
       packages: '100+ npm packages mastered',
       resolution: 'Pixel Perfect',
       de: 'Clean Architecture',
@@ -234,9 +234,9 @@ const translations = {
       }
     ],
     contacts: [
-      { label: 'GitHub', url: 'https://github.com/nyannakano', icon: '' },
-      { label: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriel-nakano/?locale=en-US', icon: '' },
-      { label: 'Email', url: 'mailto:gabrielnakano123@gmail.com', icon: '' },
+      { label: 'GitHub', url: 'https://github.com/nyannakano', icon: '/images/icons/github.png' },
+      { label: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriel-nakano/?locale=en-US', icon: '/images/icons/linkedin.png' },
+      { label: 'Email', url: 'mailto:gabrielnakano123@gmail.com', icon: '/images/icons/email.png' },
     ],
     ui: {
       fullStackDeveloper: 'Full Stack Developer',
@@ -288,7 +288,7 @@ const translations = {
   },
   pt: {
     professionalBio: `
-  Desenvolvedor Fullstack com mais de 6 de experiência na construção de
+  Desenvolvedor Fullstack com mais de 5 de experiência na construção de
   sistemas escaláveis e APIs RESTful.
   Especialista no ecossistema Laravel e em frameworks modernos de Javascript.
   Minha expertise reside em conectar arquiteturas de backend complexas com
@@ -322,7 +322,7 @@ const translations = {
       os: 'Laravel 12',
       shell: 'Vue 3 + TypeScript',
       terminal: 'Tailwind CSS',
-      uptime: '6+ anos de experiência',
+      uptime: '5+ anos de experiência',
       packages: '100+ pacotes npm dominados',
       resolution: 'Pixel Perfeito',
       de: 'Arquitetura Limpa',
@@ -514,9 +514,9 @@ const translations = {
       }
     ],
     contacts: [
-      { label: 'GitHub', url: 'https://github.com/nyannakano', icon: '' },
-      { label: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriel-nakano', icon: '' },
-      { label: 'Email', url: 'mailto:gabrielnakano123@gmail.com', icon: '' },
+      { label: 'GitHub', url: 'https://github.com/nyannakano', icon: '/images/icons/github.png' },
+      { label: 'LinkedIn', url: 'https://www.linkedin.com/in/gabriel-nakano', icon: '/images/icons/linkedin.png' },
+      { label: 'Email', url: 'mailto:gabrielnakano123@gmail.com', icon: '/images/icons/email.png' },
     ],
     ui: {
       fullStackDeveloper: 'Desenvolvedor Full Stack',
@@ -862,14 +862,44 @@ async function showProjects(): Promise<void> {
 async function showExperience(): Promise<void> {
   currentSection.value = 'experience'
   const exps = t.value.experiences
-  const totalYears = exps.reduce((acc: number, exp: Experience) => {
+
+  // Helper to get a unique number for each month/year
+  const monthYear = (date: Date) => date.getFullYear() * 12 + date.getMonth()
+
+  // Use a Set to store unique months worked
+  const workedMonths = new Set<number>()
+
+  exps.forEach((exp: Experience) => {
     const parts = exp.period.split(' - ')
     const startStr = parts[0] ?? ''
-    const endStr = parts[1] ?? ''
-    const start = new Date(startStr)
-    const end = (endStr === 'Present' || endStr === 'Presente') ? new Date() : new Date(endStr)
-    return acc + (end.getFullYear() - start.getFullYear())
-  }, 0)
+    let endStr = parts[1] ?? ''
+
+    // Standardize 'Present' to the current date
+    if (endStr.toLowerCase() === 'present' || endStr.toLowerCase() === 'presente') {
+      const now = new Date()
+      endStr = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`
+    }
+
+    const startDate = new Date(startStr)
+    const endDate = new Date(endStr)
+
+    // Ensure dates are valid before proceeding
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.error(`Invalid date found for experience: ${exp.id}`)
+      return
+    }
+
+    let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+
+    // Iterate from start to end date, month by month
+    while (current <= endDate) {
+      workedMonths.add(monthYear(current))
+      current.setMonth(current.getMonth() + 1)
+    }
+  })
+
+  // Calculate total years, rounding up
+  const totalYears = Math.ceil(workedMonths.size / 12)
 
   const lines = [
     '',
@@ -1143,11 +1173,13 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
                   v-for="contact in t.contacts"
                   :key="contact.label"
                   :href="contact.url"
+                  :icon="contact.icon"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="flex items-center gap-3 p-3 border border-terminal rounded bg-terminal-header/30 hover:bg-terminal-header/50 hover:border-terminal-cyan transition-colors group"
                 >
                   <span class="text-terminal-green">→</span>
+                  <img :src="contact.icon" alt="icon" class="w-8 h-8 object-contain">
                   <span class="text-terminal-cyan group-hover:text-terminal-text transition-colors">{{ contact.label }}</span>
                   <span class="text-terminal-muted text-xs truncate">{{ contact.url }}</span>
                 </a>
