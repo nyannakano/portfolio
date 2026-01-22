@@ -8,8 +8,8 @@ const showLanguageSelection = ref(!localStorage.getItem('portfolio-locale'))
 
 const translations = {
   en: {
-    professionalBio: `
-  Fullstack Developer with 5+ years of experience building scalable systems and
+    professionalBio: (years: number) => `
+  Fullstack Developer with ${years}+ years of experience building scalable systems and
   RESTful APIs.
   Expert in the Laravel ecosystem and modern Javascript frameworks.
   My expertise lies in bridging complex backend architecture with reactive,
@@ -42,7 +42,7 @@ const translations = {
       os: 'Laravel 12',
       shell: 'Vue 3 + TypeScript',
       terminal: 'Tailwind CSS',
-      uptime: '5+ years of experience',
+      uptime: (years: number) => `${years}+ years of experience`,
       packages: '100+ npm packages mastered',
       resolution: 'Pixel Perfect',
       de: 'Clean Architecture',
@@ -287,8 +287,8 @@ const translations = {
     },
   },
   pt: {
-    professionalBio: `
-  Desenvolvedor Fullstack com mais de 5 de experiência na construção de
+    professionalBio: (years: number) => `
+  Desenvolvedor Fullstack com mais de ${years} de experiência na construção de
   sistemas escaláveis e APIs RESTful.
   Especialista no ecossistema Laravel e em frameworks modernos de Javascript.
   Minha expertise reside em conectar arquiteturas de backend complexas com
@@ -322,7 +322,7 @@ const translations = {
       os: 'Laravel 12',
       shell: 'Vue 3 + TypeScript',
       terminal: 'Tailwind CSS',
-      uptime: '5+ anos de experiência',
+      uptime: (years: number) => `${years}+ anos de experiência`,
       packages: '100+ pacotes npm dominados',
       resolution: 'Pixel Perfeito',
       de: 'Arquitetura Limpa',
@@ -570,6 +570,38 @@ const translations = {
 
 // Computed translation helper
 const t = computed(() => translations[locale.value])
+
+const totalYearsOfExperience = computed(() => {
+  const workedMonths = new Set<number>()
+  const monthYear = (date: Date) => date.getFullYear() * 12 + date.getMonth()
+
+  t.value.experiences.forEach((exp: Experience) => {
+    const parts = exp.period.split(' - ')
+    const startStr = parts[0] ?? ''
+    let endStr = parts[1] ?? ''
+
+    if (endStr.toLowerCase() === 'present' || endStr.toLowerCase() === 'presente') {
+      const now = new Date()
+      endStr = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`
+    }
+
+    const startDate = new Date(startStr)
+    const endDate = new Date(endStr)
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      console.error(`Invalid date found for experience: ${exp.id}`)
+      return
+    }
+
+    let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+    while (current <= endDate) {
+      workedMonths.add(monthYear(current))
+      current.setMonth(current.getMonth() + 1)
+    }
+  })
+
+  return Math.ceil(workedMonths.size / 12)
+})
 
 function selectLanguage(lang: Locale): void {
   locale.value = lang
@@ -835,7 +867,7 @@ async function showWhoami(): Promise<void> {
     '',
     ...t.value.headers.whoami,
     '',
-    ...t.value.professionalBio
+    ...t.value.professionalBio(totalYearsOfExperience.value)
       .trim()
       .split('\n')
       .map((l: string) => `  ${l.trim()}`),
@@ -863,49 +895,11 @@ async function showExperience(): Promise<void> {
   currentSection.value = 'experience'
   const exps = t.value.experiences
 
-  // Helper to get a unique number for each month/year
-  const monthYear = (date: Date) => date.getFullYear() * 12 + date.getMonth()
-
-  // Use a Set to store unique months worked
-  const workedMonths = new Set<number>()
-
-  exps.forEach((exp: Experience) => {
-    const parts = exp.period.split(' - ')
-    const startStr = parts[0] ?? ''
-    let endStr = parts[1] ?? ''
-
-    // Standardize 'Present' to the current date
-    if (endStr.toLowerCase() === 'present' || endStr.toLowerCase() === 'presente') {
-      const now = new Date()
-      endStr = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`
-    }
-
-    const startDate = new Date(startStr)
-    const endDate = new Date(endStr)
-
-    // Ensure dates are valid before proceeding
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      console.error(`Invalid date found for experience: ${exp.id}`)
-      return
-    }
-
-    let current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
-
-    // Iterate from start to end date, month by month
-    while (current <= endDate) {
-      workedMonths.add(monthYear(current))
-      current.setMonth(current.getMonth() + 1)
-    }
-  })
-
-  // Calculate total years, rounding up
-  const totalYears = Math.ceil(workedMonths.size / 12)
-
   const lines = [
     '',
     ...t.value.headers.experience,
     '',
-    `  ${exps.length} ${t.value.ui.positions} | ~${totalYears}+ ${t.value.ui.yearsExperience}`,
+    `  ${exps.length} ${t.value.ui.positions} | ~${totalYearsOfExperience.value}+ ${t.value.ui.yearsExperience}`,
     '',
     `  ${t.value.ui.clickDetails}`,
     '',
@@ -923,7 +917,7 @@ async function showNeofetch(): Promise<void> {
     '       |o_o |       OS: ' + sysInfo.os,
     '       |:_/ |       Shell: ' + sysInfo.shell,
     '      //   \\ \\      Terminal: ' + sysInfo.terminal,
-    '     (|     | )     Uptime: ' + sysInfo.uptime,
+    '     (|     | )     Uptime: ' + sysInfo.uptime(totalYearsOfExperience.value),
     '    /\\_)   (_/\\    Packages: ' + sysInfo.packages,
     '    \\___)=(___/    Resolution: ' + sysInfo.resolution,
     '                    DE: ' + sysInfo.de,
@@ -1028,7 +1022,7 @@ const prompt = computed(() => 'gabriel@nakano-dev:~$')
               </div>
               <div>
                 <span class="text-terminal-purple">Uptime:</span>
-                <span class="text-terminal-text ml-2">{{ t.systemInfo.uptime }}</span>
+                <span class="text-terminal-text ml-2">{{ t.systemInfo.uptime(totalYearsOfExperience) }}</span>
               </div>
               <div>
                 <span class="text-terminal-purple">DE:</span>
