@@ -155,6 +155,24 @@ const translations = {
     ],
     experiences: [
       {
+        id: 'hinova-conecta-mid-level',
+        company: 'Hinova Conecta',
+        role: 'Mid-level Backend Developer',
+        period: 'Mar 2026 - Present',
+        location: 'Goiânia, Brazil (Remote)',
+        description:
+          'Backend development of an IoT connectivity platform for vehicle tracking, managing M2M SIM cards at scale.',
+        achievements: [
+          'Develop and maintain RESTful APIs with Laravel 10 and PHP 8.1 for SIM card lifecycle management (activation, blocking, billing and stock).',
+          'Built asynchronous processing pipelines with RabbitMQ for massive operations such as bulk activations, blocking and data exports.',
+          'Work on Node.js microservices for real-time communication (Socket.IO + Redis) and transactional email delivery.',
+          'Integrations with telecom carriers and Radius accounting for connectivity usage tracking.',
+          'Maintain dockerized environments orchestrating Nginx, PHP-FPM, MySQL 8, Redis, RabbitMQ and MinIO.'
+        ],
+        technologies: ['Laravel 10', 'PHP 8.1', 'RabbitMQ', 'Node.js', 'Socket.IO', 'Redis', 'MySQL', 'Docker', 'MinIO/S3', 'Pest'],
+        current: true,
+      },
+      {
         id: 'schmah-sondahl-mid-level',
         company: 'Schmah Sondahl Portais e Sistemas',
         role: 'Mid-level Fullstack Developer',
@@ -435,6 +453,24 @@ const translations = {
     ],
     experiences: [
       {
+        id: 'hinova-conecta-mid-level',
+        company: 'Hinova Conecta',
+        role: 'Desenvolvedor Backend Pleno',
+        period: 'Mar 2026 - Presente',
+        location: 'Goiânia, Brasil (Remoto)',
+        description:
+          'Desenvolvimento backend de uma plataforma de conectividade IoT para rastreamento veicular, gerenciando SIM cards M2M em escala.',
+        achievements: [
+          'Desenvolvimento e manutenção de APIs RESTful com Laravel 10 e PHP 8.1 para gestão do ciclo de vida de SIM cards (ativação, bloqueio, faturamento e estoque).',
+          'Construção de pipelines de processamento assíncrono com RabbitMQ para operações massivas como ativações, bloqueios e exportações em lote.',
+          'Atuação em microsserviços Node.js para comunicação em tempo real (Socket.IO + Redis) e envio de e-mails transacionais.',
+          'Integrações com operadoras de telefonia e accounting Radius para rastreio de consumo de conectividade.',
+          'Manutenção de ambientes dockerizados orquestrando Nginx, PHP-FPM, MySQL 8, Redis, RabbitMQ e MinIO.'
+        ],
+        technologies: ['Laravel 10', 'PHP 8.1', 'RabbitMQ', 'Node.js', 'Socket.IO', 'Redis', 'MySQL', 'Docker', 'MinIO/S3', 'Pest'],
+        current: true,
+      },
+      {
         id: 'schmah-sondahl-mid-level',
         company: 'Schmah Sondahl Portais e Sistemas',
         role: 'Desenvolvedor Fullstack Pleno',
@@ -575,6 +611,15 @@ const totalYearsOfExperience = computed(() => {
   const workedMonths = new Set<number>()
   const monthYear = (date: Date) => date.getFullYear() * 12 + date.getMonth()
 
+  // new Date() only parses English month abbreviations, so map the Portuguese ones
+  const ptToEnMonths: Record<string, string> = {
+    Fev: 'Feb', Abr: 'Apr', Mai: 'May', Ago: 'Aug', Set: 'Sep', Out: 'Oct', Dez: 'Dec',
+  }
+  const normalizeMonth = (str: string) => {
+    const [month, year] = str.split(' ')
+    return `${ptToEnMonths[month ?? ''] ?? month} ${year}`
+  }
+
   t.value.experiences.forEach((exp: Experience) => {
     const parts = exp.period.split(' - ')
     const startStr = parts[0] ?? ''
@@ -582,11 +627,11 @@ const totalYearsOfExperience = computed(() => {
 
     if (endStr.toLowerCase() === 'present' || endStr.toLowerCase() === 'presente') {
       const now = new Date()
-      endStr = `${now.toLocaleString('default', { month: 'short' })} ${now.getFullYear()}`
+      endStr = `${now.toLocaleString('en-US', { month: 'short' })} ${now.getFullYear()}`
     }
 
-    const startDate = new Date(startStr)
-    const endDate = new Date(endStr)
+    const startDate = new Date(normalizeMonth(startStr))
+    const endDate = new Date(normalizeMonth(endStr))
 
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       console.error(`Invalid date found for experience: ${exp.id}`)
